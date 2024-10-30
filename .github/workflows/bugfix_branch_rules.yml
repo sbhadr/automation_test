@@ -8,8 +8,10 @@ on:
             - "hotfix/*"
 
 jobs:
+
     bugfix-branch-validation:
         runs-on: ubuntu-latest
+        if: startsWith(github.head_ref, 'bugfix/')
         steps:
             - name: Check Target Branch
               run: |

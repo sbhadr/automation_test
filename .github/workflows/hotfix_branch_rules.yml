@@ -9,8 +9,10 @@ on:
             - "develop/*"
 
 jobs:
+
     hotfix-branch-validation:
         runs-on: ubuntu-latest
+        if: startsWith(github.head_ref, 'hotfix/')
         steps:
             - name: Check Target Branch
               run: |
