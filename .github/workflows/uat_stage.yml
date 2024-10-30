@@ -1,0 +1,43 @@
+name: User Acceptance Testing Stage
+
+on:
+    workflow_run:
+        workflows: ["Quality Assurance Stage"]
+        types:
+            - completed
+
+jobs:
+
+    # Pre-Requisite
+    pre-requisite:
+        runs-on: ubuntu-latest
+        if: ${{ github.event.workflow_run.conclusion == 'success' }}
+        steps:
+            - name: Pre-Requisite
+              run: |
+                echo "Running Pre-Requisites for UAT Stage"
+                echo "Pre-Requisite completed"
+
+    # Acceptance Criteria
+    acceptance-criteria:
+        needs: pre-requisite
+        runs-on: ubuntu-latest
+        steps:
+            
+            - name: Acceptance Criteria - Unit Tests
+              run: |
+                echo "Running Integration Tests as part of Acceptance Criteria"
+                python -m pip install nose2
+                ./build/integration_test.sh
+                echo "Integration Tests completed"
+            
+    # Post Deployment Criteria
+    # TODO: 
+    post-deployment:
+        needs: acceptance-criteria
+        runs-on: ubuntu-latest
+        steps:
+            - name: Post-Deployment Criteria
+              run: |
+                echo "Running Post-Deployment Checks as part of Post-Deployment Criteria"
+                echo "Post-Deployment checks completed"

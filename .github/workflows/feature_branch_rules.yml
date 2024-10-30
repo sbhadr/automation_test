@@ -1,0 +1,24 @@
+name: Feature Branch Rules
+
+on:
+    pull_request:
+        branches:
+            - "develop"
+            - "release/*"
+            - "hotfix/*"
+
+jobs:
+    feature-branch-validation:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Check Target Branch
+              run: |
+                if [[ "${{ github.base_ref }}" == develop ]]; then
+                    echo "Running workflows for PR to develop"
+                elif [[ "${{ github.base_ref }}" == release/* || "${{ github.base_ref }}" == hotfix/* ]]; then
+                    echo "Blocked PR to ${GITHUB_BASE_REF} for feature branches"
+                    exit 1
+                else
+                    echo "Not matching conditions found, abort"
+                    exit 0
+                fi
