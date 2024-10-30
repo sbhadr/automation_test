@@ -11,3 +11,6 @@ def multiply(x: int, y: int) -> int:
 
 def divide(x: int, y: int) -> int:
     return x / y
+
+def power(x: int, y: int) -> int:
+    return pow(x, y)
