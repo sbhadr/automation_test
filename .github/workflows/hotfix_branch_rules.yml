@@ -1,0 +1,25 @@
+name: Hotfix Branch Rules
+
+on:
+    pull_request:
+        branches:
+            - "release-candidate/*"
+            - "feature/*"
+            - "bugfix/*"
+            - "develop/*"
+
+jobs:
+    hotfix-branch-validation:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Check Target Branch
+              run: |
+                if [[ "${{ github.base_ref }}" == release-candidate/* ]]; then
+                    echo "Running workflows for PR to release candidate"
+                elif [[ "${{ github.base_ref }}" == feature/* || "${{ github.base_ref }}" == bugfix/* ]] || "${{ github.base_ref }}" == develop/* ]]; then
+                    echo "Blocked PR to ${GITHUB_BASE_REF} for hotfix branches"
+                    exit 1
+                else
+                    echo "Not matching conditions found, abort"
+                    exit 0
+                fi

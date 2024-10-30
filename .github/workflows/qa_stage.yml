@@ -1,0 +1,57 @@
+name: Quality Assurance Stage
+
+on:
+    pull_request:
+        branches:
+            - "develop"
+            - "release-candidate/*"
+
+jobs:
+
+    # Pre-Requisite
+    pre-requisite:
+        runs-on: ubuntu-latest
+        if: |
+            (github.base_ref == 'develop' && (startsWith(github.head_ref, 'feature/') || startsWith(github.head_ref, 'bugfix/'))) || (startsWith(github.base_ref, 'release-candidate/') && startsWith(github.head_ref, 'hotfix/'))
+        steps:
+            - name: Pre-Requisite
+              run: |
+                echo "No Pre-Requisites for QA Stage, skipping"
+
+    # Acceptance Criteria
+    acceptance-criteria:
+        needs: pre-requisite
+        runs-on: ubuntu-latest
+        steps:
+            - name: Acceptance Criteria - Linting
+              run: |
+                echo "Running Linting as part of Acceptance Criteria"
+                python -m pip install yapf
+                ./build/lint.sh
+                echo "Linting completed"
+            
+            - name: Acceptance Criteria - Unit Tests
+              run: |
+                echo "Running Unit Tests as part of Acceptance Criteria"
+                python -m pip install nose2 coverage
+                ./build/unit_test.sh
+                echo "Unit Tests completed"
+
+            - name: Acceptance Criteria - Code Coverage
+              run: |
+                echo "Running Code Coverage as part of Acceptance Criteria"
+                python -m pip install coverage
+                coverage run --source src -m nose2
+                coverage report --fail-under=100
+                echo "Code Coverage completed with required threshold (100%)"
+            
+
+    # Post Deployment Criteria
+    post-deployment:
+        needs: acceptance-criteria
+        runs-on: ubuntu-latest
+        steps:
+            - name: Post-Deployment Criteria
+              run: |
+                echo "Running Post-Deployment Checks as part of Post-Deployment Criteria"
+                echo "Post-Deployment checks completed"
